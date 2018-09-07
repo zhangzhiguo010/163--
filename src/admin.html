@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdn.bootcss.com/jquery/3.3.0/jquery.min.js"></script>
+    <script src="../node_modules/leancloud-storage/dist/av-min.js"></script>
+    <script src="../node_modules/qiniu-js/dist/qiniu.min.js"></script>
+    <style>
+        *{margin: 0; padding: 0}
+        .yyy{
+            margin: 0 auto;
+            padding: 50px 50px 0;
+            border-radius: 5%;
+            border: 2px dashed #ddd;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 200px;
+        }
+        .remind{
+            margin-top: 10px;
+            color: orange;
+        }
+        audio{
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div id="yyy" class="yyy">
+        <span id="xxx" class="xxx">点击或拖曳文件</span>
+        <p>文件大小不能超过40MB</p>
+        <div id="remind" class="remind"></div>
+        <audio controls src="http://peo1lbeva.bkt.clouddn.com/%5B%E5%88%80%E9%83%8E%5D%E5%86%B2%E5%8A%A8%E7%9A%84%E6%83%A9%E7%BD%9A-%E5%88%80%E9%83%8E%281%29.mp3"></audio>
+    </div>
+    
+    <script>
+        var APP_ID = '0aOAzIHgbhxiISxJgdoiMFf1-gzGzoHsz';
+        var APP_KEY = 'pjLggNtRK44ANHKy0Ltkj4RM';  
+        AV.init({
+            appId: APP_ID,
+            appKey: APP_KEY
+        });
+    </script>
+    <script>
+        let token = $.ajax({url:"http://localhost:8888/uptoken",async:false}).responseText
+        let observer = {
+            next(){
+                remind.innerText = "正在上传"
+            },
+            error(){
+                remind.innerText = "上传失败"
+            },
+            complete(){
+                remind.innerText = "上传完成"
+            }
+        }
+        var observable = qiniu.upload(
+            './music/[成龙]壮志在我胸-成龙.mp3', 
+            null, 
+            token, 
+            {
+
+            }, 
+            {
+                useCdnDomain: true 
+            }
+        )   
+        var subscription = observable.subscribe(observer) // 上传开始
+
+    </script>
+</body>
+</html>
