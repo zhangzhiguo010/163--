@@ -4,40 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>admin管理页面</title>
+    <link rel="stylesheet" href="./css/default.css">
     <script src="https://cdn.bootcss.com/jquery/3.3.0/jquery.min.js"></script>
     <script src="../node_modules/leancloud-storage/dist/av-min.js"></script>
     <script src="../node_modules/qiniu-js/dist/qiniu.min.js"></script>
-    <style>
-        *{margin: 0; padding: 0}
-        .yyy{
-            margin: 0 auto;
-            padding: 50px 50px 0;
-            border-radius: 5%;
-            border: 2px dashed #ddd;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 200px;
-        }
-        .remind{
-            margin-top: 10px;
-            color: orange;
-        }
-        audio{
-            margin-top: 30px;
-        }
-    </style>
+    
 </head>
 <body>
-    <div id="yyy" class="yyy">
-        <span id="xxx" class="xxx">点击或拖曳文件</span>
-        <p>文件大小不能超过40MB</p>
-        <div id="remind" class="remind"></div>
-        <audio controls src="http://peo1lbeva.bkt.clouddn.com/%5B%E5%88%80%E9%83%8E%5D%E5%86%B2%E5%8A%A8%E7%9A%84%E6%83%A9%E7%BD%9A-%E5%88%80%E9%83%8E%281%29.mp3"></audio>
+    <div class="page">
+        <aside>
+            <div class="newSong">新建歌曲</div>
+            <ul class="songList">
+                <li><a href="">歌曲1</a></li>
+                <li class="active"><a href="">歌曲2</a></li>
+                <li><a href="">歌曲3</a></li>
+                <li><a href="">歌曲4</a></li>
+                <li><a href="">歌曲5</a></li>
+                <li><a href="">歌曲6</a></li>
+                <li><a href="">歌曲7</a></li>
+                <li><a href="">歌曲8</a></li>
+                <li><a href="">歌曲9</a></li>
+            </ul>
+            <div class="uploadArea">
+                <div id="yyy" class="draggable">
+                    <div class="clickable">
+                        <input type="file" id="fileUpLoad" class="xxx">
+                        <span>点击或拖曳文件</span>
+                        <p>文件大小不能超过 40MB</p>
+                        <p class='speed'></p>
+                    </div>
+
+                </div>
+            </div>
+        </aside>
+        <main>
+            <form class="form">
+                <div class="row"><label>歌曲：<input type="text"></label>    </div>
+                <div class="row"><label>歌手：<input type="text"></label></div>
+                <div class="row"><label>外链：<input type="text"></label></div>
+                <div class="row"><button type="submit">保存</button></div>
+            </form>
+        </main>
     </div>
-    
+
     <script>
         var APP_ID = '0aOAzIHgbhxiISxJgdoiMFf1-gzGzoHsz';
         var APP_KEY = 'pjLggNtRK44ANHKy0Ltkj4RM';  
@@ -47,30 +57,74 @@
         });
     </script>
     <script>
-        let token = $.ajax({url:"http://localhost:8888/uptoken",async:false}).responseText
-        let observer = {
-            next(){
-                remind.innerText = "正在上传"
-            },
-            error(){
-                remind.innerText = "上传失败"
-            },
-            complete(){
-                remind.innerText = "上传完成"
-            }
-        }
-        var observable = qiniu.upload(
-            './music/[成龙]壮志在我胸-成龙.mp3', 
-            null, 
-            token, 
-            {
+        ajaxFunction({
+            method: 'POST',
+            url: 'http://localhost:8888/uptoken',
+            body: '',
+            headers: ''
+        }).then(
+            (response)=>{initFileInput(response)}
+        )
 
-            }, 
-            {
-                useCdnDomain: true 
-            }
-        )   
-        var subscription = observable.subscribe(observer) // 上传开始
+        let initFileInput = (res) =>{
+            res = JSON.parse(res)
+            let token = res.token
+            let config = {
+              useCdnDomain: true,
+              region: qiniu.region.z2
+            };
+            let putExtra = {
+              fname: "",
+              params: {},
+              mimeType: null
+            };
+
+            document.querySelector('#fileUpLoad').addEventListener('change', function(){
+                let file = this.files[0]
+                let key = file.name
+                let upLoadCallBack = {
+                    next(res){
+                        let total = res.total;
+                        $(".speed").text("进度：" + total.percent + "% ");
+                    },
+                    error(err){
+                        console.log(`错误：${err}`)
+                    },
+                    complete(res){
+                        let domain = 'peo1lbeva.bkt.clouddn.com'
+                        // URL/URI不能包含汉字、特殊字符，需要把他们编码，encodeURI()、encodeURIComponent()
+                        let key = encodeURIComponent(res.key) 
+                        let sourceLink = `http://${domain}/${key}`      //外链
+                        console.log(sourceLink)
+                    }
+                }
+                let observable = qiniu.upload(file, key, token, putExtra, config);
+                observable.subscribe(upLoadCallBack)
+
+            })
+        }
+
+        /**************** 自己做的函数 ********************************/
+        function ajaxFunction(objy){
+            let {method, url, body, headers} = objy
+            return new Promise( (resolve, reject) =>{
+                let xhr = new XMLHttpRequest()
+                xhr.open(method, url)
+                xhr.onreadystatechange = ()=>{
+                    if(xhr.readyState === 4){
+                        if(xhr.status>=200 && xhr.status<300){
+                            resolve.call(undefined,xhr.responseText)
+                        }else if(xhr.status>=400){
+                            reject.call(undefined, xhr)
+                        }
+                    }
+                }
+                for(let key in headers){
+                    xhr.setRequestHeader(key,headers[key])
+                }
+                xhr.send(body)
+            })
+        }
 
     </script>
 </body>

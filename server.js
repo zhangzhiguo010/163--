@@ -22,14 +22,11 @@ var method = request.method
 /******** 从这里开始看，上面不要看 ************/
 
 
-if(path === '/token'){
+if(path === '/uptoken'){
     response.statusCode = 200
     response.setHeader('Content-Type', 'text/html;charset=utf-8')
     response.setHeader('Access-Control-Allow-Origin', "*")
 
-    // 下面的工作都是为了得到uptoken，需要三个参数；accessKey、secretKey、篮子名称（数据库名）
-    // accessKey和secretKey放到本地.gitignore中，需要时读取即可
-    // 篮子名称（数据库名）直接从“七牛云”官网复制粘贴即可
     let config = fs.readFileSync('./qiniu-key.json')
     config = JSON.parse(config)
     let {accessKey, secretKey} = config
@@ -37,8 +34,11 @@ if(path === '/token'){
     let options = {scope: "163-music"};
     let putPolicy = new qiniu.rs.PutPolicy(options);
     let uploadToken = putPolicy.uploadToken(mac);
-
-    response.write(`${uploadToken}`)
+    response.write(`
+        {
+            "token": "${uploadToken}"
+        }
+    `)
     response.end()
 }else{
     response.statusCode = 404
