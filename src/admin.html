@@ -6,127 +6,25 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>admin管理页面</title>
     <link rel="stylesheet" href="./css/default.css">
-    <script src="https://cdn.bootcss.com/jquery/3.3.0/jquery.min.js"></script>
-    <script src="../node_modules/leancloud-storage/dist/av-min.js"></script>
-    <script src="../node_modules/qiniu-js/dist/qiniu.min.js"></script>
-    
 </head>
 <body>
     <div class="page">
         <aside>
-            <div class="newSong">新建歌曲</div>
-            <ul class="songList">
-                <li><a href="">歌曲1</a></li>
-                <li class="active"><a href="">歌曲2</a></li>
-                <li><a href="">歌曲3</a></li>
-                <li><a href="">歌曲4</a></li>
-                <li><a href="">歌曲5</a></li>
-                <li><a href="">歌曲6</a></li>
-                <li><a href="">歌曲7</a></li>
-                <li><a href="">歌曲8</a></li>
-                <li><a href="">歌曲9</a></li>
-            </ul>
-            <div class="uploadArea">
-                <div id="yyy" class="draggable">
-                    <div class="clickable">
-                        <input type="file" id="fileUpLoad" class="xxx">
-                        <span>点击或拖曳文件</span>
-                        <p>文件大小不能超过 40MB</p>
-                        <p class='speed'></p>
-                    </div>
-
-                </div>
-            </div>
+            <div id="newSong" class="newSong"></div>
+            <div id="songList-containner"></div>
+            <div id="uploadArea" class="uploadArea"></div>
         </aside>
-        <main>
-            <form class="form">
-                <h1>新建歌曲</h1>
-                <div class="row"><label><span>歌曲</span><input type="text"></label></div>
-                <div class="row"><label><span>歌手</span><input type="text"></label></div>
-                <div class="row"><label><span>外链</span><input type="text"></label></div>
-                <div class="row"><button type="submit">保存</button></div>
-            </form>
-        </main>
+        <main></main>
     </div>
 
-    <script>
-        var APP_ID = '0aOAzIHgbhxiISxJgdoiMFf1-gzGzoHsz';
-        var APP_KEY = 'pjLggNtRK44ANHKy0Ltkj4RM';  
-        AV.init({
-            appId: APP_ID,
-            appKey: APP_KEY
-        });
-    </script>
-    <script>
-        ajaxFunction({
-            method: 'POST',
-            url: 'http://localhost:8888/uptoken',
-            body: '',
-            headers: ''
-        }).then(
-            (response)=>{initFileInput(response)}
-        )
-
-        let initFileInput = (res) =>{
-            res = JSON.parse(res)
-            let token = res.token
-            let config = {
-              useCdnDomain: true,
-              region: qiniu.region.z2
-            };
-            let putExtra = {
-              fname: "",
-              params: {},
-              mimeType: null
-            };
-
-            document.querySelector('#fileUpLoad').addEventListener('change', function(){
-                let file = this.files[0]
-                let key = file.name
-                let upLoadCallBack = {
-                    next(res){
-                        let total = res.total;
-                        $(".speed").text("进度：" + total.percent + "% ");
-                    },
-                    error(err){
-                        console.log(`错误：${err}`)
-                    },
-                    complete(res){
-                        let domain = 'peo1lbeva.bkt.clouddn.com'
-                        // URL/URI不能包含汉字、特殊字符，需要把他们编码，encodeURI()、encodeURIComponent()
-                        let key = encodeURIComponent(res.key) 
-                        let sourceLink = `http://${domain}/${key}`      //外链
-                        console.log(sourceLink)
-                    }
-                }
-                let observable = qiniu.upload(file, key, token, putExtra, config);
-                observable.subscribe(upLoadCallBack)
-
-            })
-        }
-
-        /**************** 自己做的函数 ********************************/
-        function ajaxFunction(objy){
-            let {method, url, body, headers} = objy
-            return new Promise( (resolve, reject) =>{
-                let xhr = new XMLHttpRequest()
-                xhr.open(method, url)
-                xhr.onreadystatechange = ()=>{
-                    if(xhr.readyState === 4){
-                        if(xhr.status>=200 && xhr.status<300){
-                            resolve.call(undefined,xhr.responseText)
-                        }else if(xhr.status>=400){
-                            reject.call(undefined, xhr)
-                        }
-                    }
-                }
-                for(let key in headers){
-                    xhr.setRequestHeader(key,headers[key])
-                }
-                xhr.send(body)
-            })
-        }
-
-    </script>
+    <script src="https://cdn.bootcss.com/jquery/3.3.0/jquery.min.js"></script>
+    <script src="../node_modules/leancloud-storage/dist/av-min.js"></script>
+    <script src="../node_modules/qiniu-js/dist/qiniu.min.js"></script>
+    <script src="./js/initializers/av.js"></script>
+    <script src="./js/event-hub.js"></script>   
+    <script src="./js/song-form.js"></script>
+    <script src="./js/new-song.js"></script>
+    <script src="./js/song-list.js"></script>
+    <script src="./js/upload-song.js"></script>
 </body>
 </html>

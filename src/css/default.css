@@ -35,9 +35,11 @@ aside > .newSong{
 .newSong.active{
     background: #d4d4d4;
 }
-aside > .songList{
+aside > #songList-containner{
     flex-grow: 1;
     border-top: 2px solid #999;
+}
+.songList{
     text-align: left;
 }
 .songList > li.active{
@@ -49,13 +51,14 @@ aside > .songList{
     padding: 10px; 
     margin: 0 15px;
 }
-aside > .uploadArea{}
-.uploadArea > .draggable{
+
+.draggable{
+    display: block;
     border: 1px dashed #ddd;
     border-radius: 5%;
     padding: 20px 0;
 }
-.draggable > .clickable{
+.uploadArea > .draggable > .clickable{
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -67,11 +70,11 @@ main{
     background: #d4d4d4;
     padding-left: 20px;
 }
+main > h1{
+    margin-bottom: 10px;
+}
 main > .form{
     font-size: 14px;
-}
-.form > h1{
-    margin-bottom: 10px;
 }
 .form > .row{
     margin: 10px 0;
