@@ -18,6 +18,10 @@
                 document.querySelector('.songList').appendChild(item)
             })
         },
+        activeItem($li){
+            console.log($li)
+            $li.addClass('active').siblings('.active').removeClass('active')
+        },
         clearActive(){
             if(document.querySelector('li[class="active"]')){
                 document.querySelector('li[class="active"]').classList.remove('active')
@@ -27,6 +31,15 @@
     let model = {
         data: {
             songs: []
+        },
+        fetch(){
+            let query = new AV.Query('Song')
+            return query.find().then((songs)=>{
+                songs.map((song)=>{
+                    let songItem = Object.assign({}, {'id':song.id}, song.attributes)
+                    this.data.songs.unshift(songItem)
+                })
+            })
         }
     }
     let controller = {
@@ -34,6 +47,22 @@
             this.view = view
             this.model = model
             this.view.render(this.model.data)
+            this.getAllSongs()
+            this.bindEvents()
+            this.bindEventHubs()
+        },
+        getAllSongs(){
+            this.model.fetch().then(()=>{
+                this.view.render(this.model.data)
+            })
+        },
+        bindEvents(){
+            $(this.view.el).on('click', 'li', (ev)=>{
+                let $currentLi = $(ev.currentTarget)
+                this.view.activeItem($currentLi)
+            })
+        },
+        bindEventHubs(){
             window.eventHub.listen('upload', (data)=>{
                 this.view.clearActive()
             })
