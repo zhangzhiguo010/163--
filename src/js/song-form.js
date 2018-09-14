@@ -70,6 +70,15 @@
                 },
                 (error)=>{console.log(error)}
             )
+        },
+        update(data){
+            let song = AV.Object.createWithoutData('Song', this.data.id)
+            song.set('name', data.name)
+            song.set('singer', data.singer)
+            song.set('url', data.url)
+            return song.save().then((response)=>{
+                Object.assign(this.data, response.attributes)
+            })
         }
     }
     let controller = {
@@ -84,22 +93,13 @@
             // 五件事：拿表单数据、提交表单数据、更新model数据、渲染页面(此处为清空)、触发一个事件
             $(this.view.el).on('submit', 'form', (ev)=>{
                 ev.preventDefault()
-                let needs = ['name', 'singer', 'url']
-                let data = {}
-                needs.map((item)=>{
-                    data[item] = document.querySelector(`input[name=${item}]`).value
-                })
-
-                this.model.create(data).then(
-                    ()=>{
-                        this.view.reset()
-                        // 深拷贝，以前一直传的是同一个引用地址，现在每次传的都是新的地址
-                        // 不深拷贝，一个模块更改了数据，其他模块也跟着变化了，不行啊！！！
-                        let string = JSON.stringify(this.model.data)
-                        let object = JSON.parse(string)
-                        window.eventHub.trigger('create', object)  
-                    }
-                )
+                if(this.model.data.id){
+                    // console.log('id存在，是已经展示的数据，是数据库存在的数据')
+                    this.update()
+                }else{
+                    // console.log('id不存在，是正在新建的数据')
+                    this.create()
+                }
             })
         },
         bindEventHubs(){
@@ -114,6 +114,29 @@
                     Object.assign(this.model.data, data)
                 }
                 this.view.render(this.model.data)
+            })
+        },
+        create(){
+            let needs = ['name', 'singer', 'url']
+            let data = {}
+            needs.map((item)=>{
+                data[item] = document.querySelector(`input[name=${item}]`).value
+            })
+            this.model.create(data).then(
+                ()=>{
+                    this.view.reset()
+                    window.eventHub.trigger('create', JSON.parse(JSON.stringify(this.model.data)))  
+                }
+            )
+        },
+        update(){
+            let needs = ['name', 'singer', 'url']
+            let data = {}
+            needs.map((item)=>{
+                data[item] = document.querySelector(`input[name=${item}]`).value
+            })
+            this.model.update(data).then(()=>{
+                window.eventHub.trigger('update', JSON.parse(JSON.stringify(this.model.data)))
             })
         }
     }

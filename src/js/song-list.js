@@ -81,6 +81,14 @@
                 this.view.clearActive()
 
             })
+            window.eventHub.listen('update', (data)=>{
+                this.model.data.songs.map((song)=>{
+                    if(song.id === data.id){
+                        Object.assign(song, data)
+                    }
+                })
+                this.view.render(this.model.data)
+            })
         }
     }
 
