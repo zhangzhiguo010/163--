@@ -20,20 +20,19 @@
         },
         bindEvents(){
             document.querySelector(`${this.view.el} p`).addEventListener('click', ()=>{
-                this.active()
+                window.eventHub.trigger('new')
             })
         },
         bindEventHubs(){
-            window.eventHub.listen('upload', (data)=>{
+            window.eventHub.listen('new', ()=>{
                 this.active()
             })
-            window.eventHub.listen('select', (data)=>{
+            window.eventHub.listen('select', ()=>{
                 this.deactive()
             })
         },
         active(){
             document.querySelector(this.view.el).classList.add('active')
-            window.eventHub.trigger('new')
         },
         deactive(){
             document.querySelector(this.view.el).classList.remove('active')

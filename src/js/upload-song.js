@@ -64,7 +64,7 @@
                     let domain = 'peo1lbeva.bkt.clouddn.com'
                     let key = encodeURIComponent(res.key) 
                     let sourceLink = `http://${domain}/${key}`      //外链
-                    window.eventHub.trigger('upload', {url: sourceLink, name: res.key})
+                    window.eventHub.trigger('new', {url: sourceLink, name: res.key})
                 }
             }
         },

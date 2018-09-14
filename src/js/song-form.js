@@ -103,16 +103,17 @@
             })
         },
         bindEventHubs(){
-            window.eventHub.listen('upload', (data)=>{
-                this.view.render(data)
-            })
             window.eventHub.listen('select', (data)=>{
                 this.model.data = data
                 this.view.render(this.model.data)
             })
-            window.eventHub.listen('new', ()=>{
-                this.model.data = {name: '',singer: '',url: '',id: ''}
-                this.view.render()
+            window.eventHub.listen('new', (data)=>{
+                if(this.model.data.id){
+                    this.model.data = {name: '',singer: '',url: '',id: ''}
+                }else{
+                    Object.assign(this.model.data, data)
+                }
+                this.view.render(this.model.data)
             })
         }
     }

@@ -71,9 +71,6 @@
             })
         },
         bindEventHubs(){
-            window.eventHub.listen('upload', (data)=>{
-                this.view.clearActive()
-            })
             // 监听到事件后做2件事：更新model中数据、更新页面
             // 创建新的li和a，将ul添加到页面，循环将li添加到ul
             window.eventHub.listen('create', (data)=>{
@@ -82,7 +79,7 @@
             })
             window.eventHub.listen('new', ()=>{
                 this.view.clearActive()
-                
+
             })
         }
     }
