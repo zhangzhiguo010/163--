@@ -35,6 +35,11 @@
                 newTemplate = newTemplate.replace(`{${item}}`, data[item] || '')
             })
             document.querySelector(this.el).innerHTML = newTemplate
+            if(!data.id){
+                document.querySelector(`${this.el} h1`).innerText = '新建歌曲'
+            }else{
+                document.querySelector(`${this.el} h1`).innerText = '编辑歌曲'
+            }
         },
         reset(){
             this.render()
@@ -104,6 +109,10 @@
             window.eventHub.listen('select', (data)=>{
                 this.model.data = data
                 this.view.render(this.model.data)
+            })
+            window.eventHub.listen('new', ()=>{
+                this.model.data = {name: '',singer: '',url: '',id: ''}
+                this.view.render()
             })
         }
     }

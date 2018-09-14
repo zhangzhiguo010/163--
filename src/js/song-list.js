@@ -80,6 +80,10 @@
                 this.model.data.songs.push(data)
                 this.view.render(this.model.data)
             })
+            window.eventHub.listen('new', ()=>{
+                this.view.clearActive()
+                
+            })
         }
     }
 

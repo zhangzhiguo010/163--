@@ -2,7 +2,7 @@
     let view = {
         el: '#newSong',
         template: `
-            新建歌曲
+            <p>新建歌曲</p>
         `,
         render(data){
             document.querySelector(this.el).innerHTML = this.template
@@ -15,7 +15,13 @@
             this.model = model
             this.view.render(this.model.data)
             this.bindEventHubs()
+            this.bindEvents()
             this.active()
+        },
+        bindEvents(){
+            document.querySelector(`${this.view.el} p`).addEventListener('click', ()=>{
+                this.active()
+            })
         },
         bindEventHubs(){
             window.eventHub.listen('upload', (data)=>{
@@ -27,6 +33,7 @@
         },
         active(){
             document.querySelector(this.view.el).classList.add('active')
+            window.eventHub.trigger('new')
         },
         deactive(){
             document.querySelector(this.view.el).classList.remove('active')
