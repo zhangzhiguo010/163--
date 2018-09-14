@@ -73,9 +73,7 @@
             this.model = model
             this.view.render(this.model.data)
             this.bindEvents()
-            window.eventHub.listen('upload', (data)=>{
-                this.view.render(data)
-            })
+            this.bindEventHubs()
         },
         bindEvents(){
             // 五件事：拿表单数据、提交表单数据、更新model数据、渲染页面(此处为清空)、触发一个事件
@@ -97,6 +95,15 @@
                         window.eventHub.trigger('create', object)  
                     }
                 )
+            })
+        },
+        bindEventHubs(){
+            window.eventHub.listen('upload', (data)=>{
+                this.view.render(data)
+            })
+            window.eventHub.listen('select', (data)=>{
+                this.model.data = data
+                this.view.render(this.model.data)
             })
         }
     }

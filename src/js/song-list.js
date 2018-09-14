@@ -11,6 +11,7 @@
                 let a = document.createElement('a')
                 a.innerText = item.name
                 li.appendChild(a)
+                li.setAttribute('data-song-id', item.id)
                 return li
             })
             document.querySelector(this.el).innerHTML = this.template
@@ -18,8 +19,8 @@
                 document.querySelector('.songList').appendChild(item)
             })
         },
-        activeItem($li){
-            console.log($li)
+        activeItem(li){
+            let $li = $(li)
             $li.addClass('active').siblings('.active').removeClass('active')
         },
         clearActive(){
@@ -37,7 +38,7 @@
             return query.find().then((songs)=>{
                 songs.map((song)=>{
                     let songItem = Object.assign({}, {'id':song.id}, song.attributes)
-                    this.data.songs.unshift(songItem)
+                    this.data.songs.push(songItem)
                 })
             })
         }
@@ -58,8 +59,15 @@
         },
         bindEvents(){
             $(this.view.el).on('click', 'li', (ev)=>{
-                let $currentLi = $(ev.currentTarget)
-                this.view.activeItem($currentLi)
+                let currentSong
+                let currentSongId = ev.currentTarget.getAttribute('data-song-id')
+                this.view.activeItem(ev.currentTarget)
+                this.model.data.songs.map((item)=>{
+                    if(currentSongId === item.id){
+                        currentSong = item
+                    }
+                })
+                window.eventHub.trigger('select', JSON.parse(JSON.stringify(currentSong)))
             })
         },
         bindEventHubs(){
