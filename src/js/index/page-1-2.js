@@ -1,16 +1,21 @@
 {
     let view = {
         el: '#page-1 > .songs',
+        template: `
+            <h3>{name}</h3>
+            <p>{singer}</p>
+            <a class="playButton" href="./song.html?id={id}"></a>
+        `,
         render(data){
             let {songs} = data
+            let placeholder = ['name', 'singer', 'id']
             songs.map((song)=>{
-                let templateLi = `
-                    <h3>${song.name}</h3>
-                    <p>${song.singer}</p>
-                    <a></a>
-                `
+                let newTemplate = this.template
+                placeholder.map((item)=>{
+                    newTemplate = newTemplate.replace(`{${item}}`, song[`${item}`])
+                })
                 let li = document.createElement('li')
-                li.innerHTML = templateLi
+                li.innerHTML = newTemplate
                 document.querySelector(`${this.el} ol.list`).appendChild(li)
             })
         }

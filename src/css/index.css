@@ -160,6 +160,8 @@ section.songs > .list .playButton{
     right:8px;
     top: 50%;
     transform: translateY(-50%);
+    padding: 10px;
+    background: #ddd;
 }
 section.songs > .list .icon-play{
     width: 22px;
