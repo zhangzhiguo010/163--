@@ -34,7 +34,9 @@
             width: 100%;
             height: 100%;
             z-index: 1;
-            background: rgba(0, 0, 0, 0.2)
+            background: rgba(0, 0, 0, 0.2);
+            /* 用户穿透DIV，上传动画虽占满全屏，依然柯点击页面 */
+            pointer-events: none;
         }
         .site-loading.active{
             visibility: visible;
