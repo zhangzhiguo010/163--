@@ -52,8 +52,11 @@
             observable.subscribe(this.upLoadCallBack())
         },
         upLoadCallBack(){
+            // window.eventHub.trigger('beforeUpload')
+            // 上传之前触发的事件，没找到API，不知在哪里添加
             return {
                 next(res){
+                    window.eventHub.trigger('beforeUpload')
                     let total = res.total;
                     document.querySelector('.speed').innerText = `速度：${total.percent}%`
                 },
@@ -61,6 +64,8 @@
                     console.log(`错误：${err}`)
                 },
                 complete(res){
+                    window.eventHub.trigger('afterUpload')
+
                     let domain = 'peo1lbeva.bkt.clouddn.com'
                     let key = encodeURIComponent(res.key) 
                     let sourceLink = `http://${domain}/${key}`      //外链

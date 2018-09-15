@@ -5,23 +5,20 @@
             <ul class='songList'></ul>
         `,
         render(data){
-            let {songs} = data
+            let {songs, selectSongId} = data
             let liList = songs.map((item)=>{
                 let li = document.createElement('li')
                 let a = document.createElement('a')
                 a.innerText = item.name
                 li.appendChild(a)
                 li.setAttribute('data-song-id', item.id)
+                if(item.id === selectSongId){$(li).addClass('active')}
                 return li
             })
             document.querySelector(this.el).innerHTML = this.template
             liList.map((item)=>{
                 document.querySelector('.songList').appendChild(item)
             })
-        },
-        activeItem(li){
-            let $li = $(li)
-            $li.addClass('active').siblings('.active').removeClass('active')
         },
         clearActive(){
             if(document.querySelector('li[class="active"]')){
@@ -31,7 +28,8 @@
     }
     let model = {
         data: {
-            songs: []
+            songs: [],
+            selectSongId: undefined //被选中的元素记录在这里，render的时候寻找该信息添加样式
         },
         fetch(){
             let query = new AV.Query('Song')
@@ -59,9 +57,12 @@
         },
         bindEvents(){
             $(this.view.el).on('click', 'li', (ev)=>{
-                let currentSong
                 let currentSongId = ev.currentTarget.getAttribute('data-song-id')
-                this.view.activeItem(ev.currentTarget)
+                this.model.data.selectSongId = currentSongId
+                this.view.render(this.model.data)
+
+                // this.view.activeItem(ev.currentTarget)
+                let currentSong
                 this.model.data.songs.map((item)=>{
                     if(currentSongId === item.id){
                         currentSong = item
@@ -82,6 +83,7 @@
 
             })
             window.eventHub.listen('update', (data)=>{
+                // this.model.data.selectSongId = data.id
                 this.model.data.songs.map((song)=>{
                     if(song.id === data.id){
                         Object.assign(song, data)
