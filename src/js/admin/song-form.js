@@ -20,6 +20,11 @@
                     </label>
                 </div>
                 <div class="row">
+                    <label>
+                        <span>封面</span><input type="text" name="cover" value="{cover}">
+                    </label>
+                </div>
+                <div class="row">
                     <button type="submit">保存</button>
                 </div>
             </form>
@@ -29,7 +34,7 @@
             // 首先明确要更新哪些占位符，将它们放入一个数组中，方便遍历
             // 其次创建新模板，不断用新数据来更新这个模板
             // 最后将新的模板渲染进页面
-            let placeholder = ['name', 'url', 'singer', 'id']
+            let placeholder = ['name', 'url', 'singer', 'id', 'cover']
             let newTemplate = this.template
             placeholder.map((item)=>{
                 newTemplate = newTemplate.replace(`{${item}}`, data[item] || '')
@@ -50,7 +55,8 @@
             name: '',
             singer: '',
             url: '',
-            id: ''
+            id: '',
+            cover: ''
         },
         create(data){
             var Song = AV.Object.extend('Song');
@@ -58,6 +64,7 @@
             song.set('name',data.name);
             song.set('singer',data.singer);
             song.set('url',data.url);
+            song.set('cover',data.cover);
             return song.save().then(
                 (newSong)=>{
                     let {id, attributes} = newSong
@@ -117,7 +124,7 @@
             })
         },
         create(){
-            let needs = ['name', 'singer', 'url']
+            let needs = ['name', 'singer', 'url', 'cover']
             let data = {}
             needs.map((item)=>{
                 data[item] = document.querySelector(`input[name=${item}]`).value
@@ -130,7 +137,7 @@
             )
         },
         update(){
-            let needs = ['name', 'singer', 'url']
+            let needs = ['name', 'singer', 'url', 'cover']
             let data = {}
             needs.map((item)=>{
                 data[item] = document.querySelector(`input[name=${item}]`).value
